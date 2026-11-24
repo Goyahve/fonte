@@ -1,6 +1,6 @@
 // Fonte — service worker : l'app s'ouvre instantanément et fonctionne hors connexion.
 // Pour publier une mise à jour, change le numéro de version ci-dessous.
-const CACHE = 'fonte-v2';
+const CACHE = 'fonte-v3';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png',
   './img/gus-1.webp', './img/gus-1-closed.webp', './img/hd/gus-1.webp',
   './img/gus-2.webp', './img/gus-2-closed.webp', './img/hd/gus-2.webp',
