@@ -1,9 +1,7 @@
 // Fonte — service worker : l'app s'ouvre instantanément et fonctionne hors connexion.
 // Pour publier une mise à jour, change le numéro de version ci-dessous.
-const CACHE = 'fonte-v4';
-const ASSETS = ['./', './index.html', './companions.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png',
-  './fonts/barlow-latin-400-normal.woff2', './fonts/barlow-latin-500-normal.woff2', './fonts/barlow-latin-600-normal.woff2', './fonts/barlow-latin-700-normal.woff2',
-  './fonts/barlow-condensed-latin-600-normal.woff2', './fonts/barlow-condensed-latin-700-normal.woff2', './fonts/pixelify-sans-latin-600-normal.woff2'];
+const CACHE = 'fonte-v7';
+const ASSETS = ['./', './index.html', './companions.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

@@ -663,6 +663,9 @@ function skipEvo(){if(!st.evo)return;const e=st.evo;st.evo=null;st.dim=0;st.flas
 function thumb(canvas,c,f,o={}){const C=CRE[c],F=C.forms[f];canvas.width=F.w;canvas.height=F.h;const g=canvas.getContext('2d'),im=g.createImageData(F.w,F.h),u=new Uint32Array(im.data.buffer);
   const sil=o.sil?hex2u32(String(o.sil).replace('#','')):0;for(let i=0;i<F.idx.length;i++){const k=F.idx[i];if(k)u[i]=sil||C.pal32[k]}g.putImageData(im,0,0)}
 window.Pets={count:CRE.length,
+  head:()=>{const F=FORMS[fi];if(!F._hd){let top=0;outer:for(let y=0;y<F.h;y++)for(let x=0;x<F.w;x++)if(F.idx[y*F.w+x]){top=y;break outer}
+    const band=Math.max(3,Math.round(F.h*.1));let sx=0,n=0;for(let y=top;y<Math.min(F.h,top+band);y++)for(let x=0;x<F.w;x++)if(F.idx[y*F.w+x]){sx+=x;n++}F._hd=[n?sx/n:F.w/2,top]}
+    const p=fwd(F,F._hd[0],F._hd[1],kinNow);return{x:p[0],y:p[1],W:SW,H:SH}},
   info:c=>({name:CRE[c].name,biome:CRE[c].biome,forms:CRE[c].forms.map(F=>F.name),sizes:CRE[c].forms.map(F=>[F.w,F.h])}),
   show,stop,evolve,skipEvo,thumb,pause:()=>{if(st.evo)return;offscreen=true;running=false;cancelAnimationFrame(raf)},resume:()=>{offscreen=false;if(cv&&wanted&&!running&&document.visibilityState!=='hidden'){running=true;last=performance.now()-40;raf=requestAnimationFrame(frame)}},act:a=>{if(!st.evo)doAct(a)},acts:()=>FORMS[fi].rig.acts,evolving:()=>!!st.evo};
 
