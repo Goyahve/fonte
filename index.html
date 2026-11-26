@@ -86,11 +86,30 @@ body.live #app{padding-bottom:calc(160px + env(safe-area-inset-bottom))}
 .pb2 i{position:absolute;top:0;bottom:0;left:0;background:color-mix(in srgb,var(--acc) 55%,var(--card3))}
 .pb2 i.nw{background:var(--acc);transform-origin:left;animation:gr .9s .25s steps(8) both}
 @keyframes gr{from{transform:scaleX(0)}}
+.badges.won .bdg{animation:bpop .45s cubic-bezier(.2,.9,.3,1.25) both}
+.badges.won .bi{position:relative;animation:bspin 1.25s cubic-bezier(.15,.7,.25,1) both}
+@keyframes bpop{from{opacity:0;transform:translateY(8px)}}
+@keyframes bspin{from{transform:perspective(320px) rotateY(-720deg) scale(.55)}to{transform:perspective(320px) rotateY(0) scale(1)}}
+@property --sa{syntax:'<angle>';inherits:false;initial-value:0deg}
+.shn{position:absolute;inset:0;display:block;background:conic-gradient(from var(--sa),transparent 0 76%,rgb(255 255 255 / .9) 84%,transparent 92%);-webkit-mask-size:contain,100% 100%;mask-size:contain,100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-composite:source-in;mask-composite:intersect;mix-blend-mode:screen;opacity:0;animation:bshine 1.5s ease-in-out 2 both;pointer-events:none}
+@keyframes bshine{0%{--sa:0deg;opacity:0}12%{opacity:1}88%{opacity:1}100%{--sa:360deg;opacity:0}}
+@media(prefers-reduced-motion:reduce){.badges.won .bdg,.badges.won .bi{animation:none}}
+.tour .tr-v{margin-top:28px;display:grid;place-items:center;min-height:132px;background:#05040f;clip-path:var(--st3);padding:16px}
+.tr-ic{display:grid;place-items:center;width:72px;height:72px;background:var(--asoft);color:var(--acc);clip-path:var(--st2)}.tr-ic .i{width:36px;height:36px}
+.tr-th{width:auto;height:96px;image-rendering:pixelated}
+.tr-p{font-size:17px;line-height:1.5}.tr-p .i{vertical-align:-3px}
+.tr-dots{display:flex;gap:6px;margin-top:24px}.tr-dots i{width:8px;height:8px;background:var(--card3)}.tr-dots i.on{background:var(--acc)}
 .gain{background:var(--card2);clip-path:var(--st2);padding:12px 14px}
 /* compagnon */
 .pet{background:var(--card);clip-path:var(--st3)}
 .pet-v{position:relative;background:#05040f;line-height:0}
-.pet-v canvas{display:block;width:100%;height:auto;aspect-ratio:256/240;touch-action:manipulation;cursor:pointer}
+.pet-v canvas{display:block;width:100%;height:auto;aspect-ratio:256/240;touch-action:pan-y;cursor:pointer}
+.pet-v canvas.sw-n{animation:swn .3s steps(6) both}.pet-v canvas.sw-p{animation:swp .3s steps(6) both}
+@keyframes swn{from{transform:translateX(14%);opacity:0}}@keyframes swp{from{transform:translateX(-14%);opacity:0}}
+.pet-nav{position:absolute;top:50%;margin-top:-22px;width:44px;height:44px;border:0;padding:0;display:grid;place-items:center;background:rgb(5 4 15 / .55);color:#efecff;clip-path:var(--st2);z-index:2;cursor:pointer}
+.pet-nav.l{left:8px}.pet-nav.r{right:8px}.pet-nav.r .i{transform:scaleX(-1)}
+.pet-dots{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:6px;z-index:2;pointer-events:none}
+.pet-dots i{width:8px;height:8px;background:rgb(239 236 255 / .35)}.pet-dots i.on{background:var(--acc)}
 .pet-b{padding:14px 16px 16px}
 .pet-h{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
 .pet-k{font-size:13px;font-weight:600;color:var(--mute)}
@@ -847,8 +866,8 @@ function derive(){
   const day=ymd(s.start);let bw=null;for(const e of bodyS){if(e.d<=day)bw=e.kg;else break}if(bw==null&&bodyS.length)bw=bodyS[0].kg;
   for(const it of s.items){const tm=TIMED.has(it.ex);for(const x of it.sets){if(!tm)reps+=x.r;if(bw&&x.w>0&&x.r>0)bwx=Math.max(bwx,x.w/bw)}}});
  let months=0,mr=0,pm_=null;[...mset].sort((a,b)=>a-b).forEach(m=>{mr=pm_!=null&&m===pm_+1?mr+1:1;pm_=m;months=Math.max(months,mr)});
- const P_=S.pet,fin=P_?P_.done.length+(P_.form>=3&&!P_.done.includes(P_.c)?1:0):0;
- const ctx={vol:tVol,n:ss.length,months,met,run:bestRun,prs:tPr,evo:P_&&(P_.form>0||P_.done.length)?1:0,fin:fin?1:0,coll:fin,early:early7,night:night?1:0,jan1,back,exo:seen.size,
+ const P_=S.pet,bk=P_&&P_.bank?Object.values(P_.bank):[],fin=P_?P_.done.length+(P_.form>=3&&!P_.done.includes(P_.c)?1:0):0;
+ const ctx={vol:tVol,n:ss.length,months,met,run:bestRun,prs:tPr,evo:P_&&(P_.form>0||P_.done.length||bk.some(x=>x.form>0))?1:0,fin:fin?1:0,coll:fin,early:early7,night:night?1:0,jan1,back,exo:seen.size,
   mus:Math.max(0,...Object.values(weeks).map(w=>w.mus.size)),bw:Math.floor(bwx*100)/100,reps,hours,ok:tOk,goals:goals.filter(g=>g.done).length};
  const badges=BADGES.map(b=>{const v=ctx[b.k]||0;return{...b,val:v,on:v>=b.g}});xp.trophees=sum(badges.filter(b=>b.on).map(b=>RAR[b.r][1]));
  const total=sum(Object.values(xp));
@@ -872,6 +891,15 @@ const I=id=>document.getElementById(id);
 const reduceM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const formAt=xp=>{let f=0;TH.forEach((v,i)=>{if(xp>=v)f=i});return f};
 const petsLeft=()=>[0,1,2,3].filter(c=>!S.pet||(c!==S.pet.c&&!S.pet.done.includes(c)));
+/* plusieurs compagnons : l'XP va au compagnon affiché sur l'accueil ; les autres gardent la leur */
+const PB=()=>(S.pet.bank=S.pet.bank||{});
+function petSaved(k){const b=PB()[k];return b?b:S.pet.done.includes(k)?{xp:TH[3],form:3}:{xp:0,form:0}}
+let PSW=0;
+function petSwitch(k,dir){if(!S.pet||EVO||CH)return;k=(k+4)%4;if(k===S.pet.c)return;
+ if(S.active){toast(`Ta séance en cours nourrit ${PN[S.pet.c][clamp(S.pet.form|0,0,3)]}. Change après l’avoir terminée.`);return}
+ const d=derive(),p=S.pet,cur={xp:Math.max(0,d.total-p.start),form:clamp(p.form|0,0,3)};
+ PB()[p.c]=cur;if(cur.form>=3&&!p.done.includes(p.c))p.done.push(p.c);
+ const nb=petSaved(k);delete PB()[k];p.c=k;p.form=nb.form;p.start=d.total-nb.xp;save();PSW=dir||1;render()}
 function petOf(d){const p=S.pet;if(!p)return null;const xp=Math.max(0,d.total-p.start),f=clamp(p.form|0,0,3),due=formAt(xp);
  return{c:p.c,xp,form:f,due,ready:due>f,final:f>=3,name:PN[p.c][f],sp:PETS[p.c].sp,lo:TH[f],hi:f<3?TH[f+1]:TH[3]}}
 function setAccent(c){ACCV=null;const r=document.documentElement;const v=c!=null?c:S.pet?S.pet.c:null;if(v==null)delete r.dataset.pet;else r.dataset.pet=v}
@@ -880,9 +908,11 @@ const thumb=(c,f,sil,cls='')=>`<canvas class="px${cls?' '+cls:''}" data-th="${c}
 function petCard(d){const p=petOf(d);
  if(!p)return `<section class="card pet-x"><h2>Choisis ton compagnon</h2><p class="mute">Il grandit avec tes séances et évolue à la fin de l’une d’elles.</p><button class="btn pri" data-a="chFirst">Voir les compagnons</button></section>`;
  const pct=p.final?100:Math.round(clamp((p.xp-p.lo)/(p.hi-p.lo),0,1)*1000)/10,lv=d.lv,left=petsLeft();
- const foot=p.final?`<div class="pet-f"><span><b>Forme finale atteinte</b></span><span class="num">${nf.format(p.xp)} XP</span></div>${left.length?`<button class="btn pri full mt12" data-a="chNext">Choisir mon prochain compagnon</button>`:`<div class="pet-note">${ic('check','s')}<span>Collection complète : tes 4 compagnons ont atteint leur forme finale.</span></div>`}`
+ const foot=p.final?`<div class="pet-f"><span><b>Forme finale atteinte</b></span><span class="num">${nf.format(p.xp)} XP</span></div>${left.length?`<div class="pet-note">${ic('arrow','s')}<span>Glisse sur la carte pour faire grandir un autre compagnon.</span></div>`:`<div class="pet-note">${ic('check','s')}<span>Collection complète : tes 4 compagnons ont atteint leur forme finale.</span></div>`}`
   :`<div class="xpbar" role="progressbar" aria-label="Progression vers la prochaine forme" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><i style="width:${pct}%"></i></div><div class="pet-f"><span class="num"><b>${nf.format(p.xp)}</b> / ${nf.format(p.hi)} XP</span><span>${p.ready?'Évolution prête':`Évolution dans ${nf.format(p.hi-p.xp)}${NB}XP`}</span></div>${p.ready?`<div class="pet-note">${ic('up','s')}<span>${esc(p.name)} évoluera à la fin de ta prochaine séance.</span></div>`:''}`;
- return `<section class="pet" aria-label="${esc(p.name)}, ton compagnon"><div class="pet-v"><canvas id="petcv" class="px" width="256" height="240" role="img" aria-label="${esc(p.name)} dans sa scène. Touche-le pour le faire réagir."></canvas><div class="pet-bub" id="petbub" aria-live="polite"></div></div>
+ return `<section class="pet" aria-label="${esc(p.name)}, ton compagnon"><div class="pet-v"><canvas id="petcv" class="px${PSW>0?' sw-n':PSW<0?' sw-p':''}" width="256" height="240" role="img" aria-label="${esc(p.name)} dans sa scène. Touche-le pour le faire réagir, glisse pour changer de compagnon."></canvas><div class="pet-bub" id="petbub" aria-live="polite"></div>
+ <button class="pet-nav l" data-a="petPrev" aria-label="Compagnon précédent">${ic('back')}</button><button class="pet-nav r" data-a="petNext" aria-label="Compagnon suivant">${ic('back')}</button>
+ <div class="pet-dots" aria-hidden="true">${[0,1,2,3].map(k=>`<i${k===p.c?' class="on"':''}></i>`).join('')}</div></div>
  <div class="pet-b"><div class="pet-h"><div><div class="pet-k">${esc(p.sp)} · forme ${p.form+1} sur 4</div><div class="pet-n">${esc(p.name)}</div></div><div class="pet-l num"><span>Niveau</span>${lv.L}</div></div>${foot}</div></section>`}
 function petCollection(d){const p=S.pet;const order=p?[p.c,...p.done.filter(c=>c!==p.c),...petsLeft()]:[0,1,2,3];const all=p&&!petsLeft().length&&p.form>=3;
  const n=p?p.done.length+(p.form>=3?1:0):0;
@@ -941,7 +971,7 @@ function posBub(){const b=I('petbub'),cv=I('petcv');if(!b||!cv||!hasPets)return;
  b.style.setProperty('--tx',clamp(px-left,12,bw-12)+'px');b.style.setProperty('--ty',clamp(py-top,10,bh-10)+'px')}
 function petPoke(){const b=I('petbub');if(!b)return;b.textContent=pickLine();posBub();b.classList.add('on');clearTimeout(bubT);bubT=setTimeout(()=>{const x=I('petbub');if(x)x.classList.remove('on')},3800)}
 function mountPet(){if(!hasPets||EVO||CH)return;const cv=I('petcv');if(!cv||!S.pet||woOpen){Pets.stop();return}
- Pets.show(cv,S.pet.c,clamp(S.pet.form|0,0,3),{auto:!reduceM,interactive:true,onPoke:petPoke});
+ Pets.show(cv,S.pet.c,clamp(S.pet.form|0,0,3),{auto:!reduceM,interactive:true,onPoke:petPoke});PSW=0;
  if(petIO)petIO.disconnect();try{petIO=new IntersectionObserver(es=>{const v=es[es.length-1].isIntersecting;if(EVO||CH||!I('petcv'))return;v?Pets.resume():Pets.pause()});petIO.observe(cv)}catch(e){}}
 let petIO=null;
 
@@ -954,7 +984,18 @@ function needInstall(){return !isStandalone()&&!inFrame()&&!(S.flags&&S.flags.in
 addEventListener('appinstalled',()=>{INST=2;BIP=null;if(CH&&CH.mode==='install')renderChooser()});
 function openChooser(mode){const opts=mode==='next'?petsLeft():[0,1,2,3];if(!opts.length||CH)return;
  CH={mode,opts,sel:opts[0],from:S.pet?PN[S.pet.c][3]:''};I('choose').classList.add('on');document.body.classList.add('lock');renderChooser();I('choose').scrollTop=0}
+const TOUR=[
+ {ic:'plus',t:'Lance une séance',p:'<b>Séance libre</b> : tu choisis tes exercices.<br><b>Séance auto</b> : Fonte la prépare selon ton matériel et tes muscles reposés.'},
+ {ic:'check',t:'Note tes séries',p:`Touche une case pour écrire le poids et les répétitions, puis ${ic('check','s')} quand la série est faite. Le repos se lance tout seul.`},
+ {pet:1,t:'Fais grandir ton compagnon',p:'Chaque séance lui donne de l’XP, et il évolue à la fin d’une séance. Glisse sur sa carte pour en faire grandir un autre.'}];
+function tourEnd(){S.flags={...(S.flags||{}),tour:1};save();const first=CH&&CH.first;closeChooser();if(first&&S.pet)toast(`${PN[S.pet.c][0]} te rejoint`)}
 function renderChooser(){if(!CH)return;const el=I('choose'),y=el.scrollTop;
+ if(CH.mode==='tour'){const T=TOUR[CH.step],last=CH.step===TOUR.length-1;
+  el.innerHTML=`<div class="ch-in tour"><p class="kick">Prise en main · ${CH.step+1} sur ${TOUR.length}</p>
+  <div class="tr-v">${T.pet&&S.pet?thumb(S.pet.c,clamp(S.pet.form|0,0,3),false,'tr-th'):`<span class="tr-ic">${ic(T.ic||'up')}</span>`}</div>
+  <h1 class="mt20">${T.t}</h1><p class="mt12 tr-p">${T.p}</p>
+  <div class="tr-dots" aria-hidden="true">${TOUR.map((_,i)=>`<i${i===CH.step?' class="on"':''}></i>`).join('')}</div>
+  <div class="ch-cta"><button class="btn big pri" data-a="tourNext">${last?'C’est parti':'Suivant'}</button>${last?'':'<button class="btn full mt12" data-a="tourEnd">Passer</button>'}</div></div>`;thumbs(el);return}
  if(CH.mode==='install'){const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
   el.innerHTML=`<div class="ch-in inst"><div class="inst-logo">${logo()}</div><p class="kick mt20">Bienvenue dans Fonte</p><h1 class="mt8">${INST===2?'Fonte est installée':'Installe Fonte'}</h1>
   <p class="mute mt8">${INST===2?'Ouvre Fonte depuis ton écran d’accueil pour choisir ton prénom et ton compagnon.':'Elle s’ajoute à ton écran d’accueil et fonctionne sans connexion, comme une vraie application.'}</p>
@@ -965,7 +1006,7 @@ function renderChooser(){if(!CH)return;const el=I('choose'),y=el.scrollTop;
   <div class="ch-cta"><button class="btn big pri" data-a="nameOk">Continuer</button></div></div>`;
   setTimeout(()=>{const x=I('nmIn');if(x)x.focus()},80);return}
  const c=CH.sel,first=CH.mode==='first',n=uName();
- el.innerHTML=`<div class="ch-in">${first?(n?`<p class="kick">Bienvenue, ${esc(n)}</p>`:''):`<p class="kick">${esc(CH.from)} a atteint sa forme finale</p>`}<h1 class="mt8">${first?'Choisis ton compagnon':'Choisis ton prochain compagnon'}</h1>
+ el.innerHTML=`<div class="ch-in">${first?(n?`<p class="kick">Bienvenue, ${esc(n)}</p>`:''):`<p class="kick">${esc(CH.from)} a atteint sa forme finale</p>`}<h1 class="mt8">${first?'Choisis ton compagnon':'Choisis ton prochain compagnon'}</h1>${first?'<p class="mute mt8">Tu pourras en changer quand tu veux depuis l’accueil.</p>':''}
  <div class="ch-v">${hasPets?`<canvas id="chcv" class="px" width="256" height="240" role="img" aria-label="${esc(SPN[c])} dans sa scène"></canvas>`:''}</div>
  <div class="ch-g" role="group" aria-label="Compagnons">${[0,1,2,3].map(k=>{const ok=CH.opts.includes(k),done=S.pet&&(S.pet.done.includes(k)||S.pet.c===k)&&!first;
   return `<button class="ch-c" data-a="chSel" data-c="${k}" aria-pressed="${k===c}" style="--c:${PETS[k].c}"${ok?'':' disabled'}>${thumb(k,done?3:0,false)}<b>${esc(SPN[k])}</b>${done?'<span>Terminé</span>':''}</button>`}).join('')}</div>
@@ -978,7 +1019,7 @@ function closeChooser(){CH=null;const el=I('choose');el.classList.remove('on');e
 function choosePet(){const c=CH.sel,d=derive();
  if(CH.mode==='first'||!S.pet)S.pet={c,start:d.total,form:0,done:[]};
  else{const p=S.pet;if(!p.done.includes(p.c))p.done.push(p.c);p.start=Math.min(d.total,p.start+TH[3]);p.c=c;p.form=0}
- save();closeChooser();toast(`${PN[c][0]} te rejoint`)}
+ const wasFirst=CH.mode==='first';save();if(wasFirst&&!(S.flags&&S.flags.tour)){CH={mode:'tour',step:0,first:true};setAccent(c);renderChooser();I('choose').scrollTop=0;return}closeChooser();toast(`${PN[c][0]} te rejoint`)}
 
 /* évolution : jouée uniquement après « Terminer » une séance */
 let EVO=null;
@@ -995,7 +1036,7 @@ function petBlock(b,a,evo){const p=petOf(a);let h='';const up=a.lv.L>b.lv.L;
  if(evo)h+=`<div class="lvup">${thumb(evo.c,evo.to,false)}<div><b>${esc(PN[evo.c][evo.from])} a évolué en ${esc(PN[evo.c][evo.to])}</b><div class="sm">${evo.to>=3?'Forme finale':`Forme ${evo.to+1} sur 4`}${up?` · niveau ${a.lv.L} atteint`:''}</div></div></div>`;
  else if(up)h+=`<div class="lvup">${ic('up')}<div><b>Niveau ${a.lv.L} atteint</b><div class="sm">${a.lv.max?'Niveau maximum':`Encore ${nf.format(a.lv.need-a.lv.into)}${NB}XP avant le niveau ${a.lv.L+1}`}</div></div></div>`;
  if(!p)return h;
- if(p.final){const left=petsLeft();h+=`<div class="gain mt16"><b>${esc(p.name)} · forme finale</b><p class="sm mute mt8">${left.length?'Choisis le compagnon qui prend le relais. Ton XP en trop lui est transmise.':'Tes 4 compagnons ont atteint leur forme finale.'}</p>${left.length?'<button class="btn pri full mt12" data-a="chNext">Choisir mon prochain compagnon</button>':''}</div>`;return h}
+ if(p.final){const left=petsLeft();h+=`<div class="gain mt16"><b>${esc(p.name)} · forme finale</b><p class="sm mute mt8">${left.length?'Pour faire grandir un autre compagnon, glisse sur sa carte dans l’accueil.':'Tes 4 compagnons ont atteint leur forme finale.'}</p></div>`;return h}
  const xb=Math.max(0,b.total-S.pet.start),span=p.hi-p.lo,pb=evo?0:clamp((xb-p.lo)/span,0,1)*100,pa=clamp((p.xp-p.lo)/span,0,1)*100;
  h+=`<div class="gain mt16"><div class="row"><b class="grow">${esc(p.name)} · forme ${p.form+1} sur 4</b><span class="sm mute num">${nf.format(p.xp)} / ${nf.format(p.hi)} XP</span></div><div class="pb2 mt8"><i style="width:${pb}%"></i><i class="nw" style="left:${pb}%;width:${Math.max(0,pa-pb)}%"></i></div><p class="xs mute mt8">Encore ${nf.format(Math.max(0,p.hi-p.xp))}${NB}XP avant la prochaine forme · niveau ${a.lv.L}</p></div>`;
  return h}
@@ -1136,7 +1177,8 @@ function vSet(){const custom=S.custom,d=derive(),old=S.sessions.length&&(!S.last
  <label class="setrow"><div class="grow"><b>Notification de fin de repos</b><div class="sm mute">Fait vibrer le téléphone, même écran éteint</div></div><input type="checkbox" class="sw" data-set="notif"${S.settings.notif!==false?' checked':''}></label>
  <label class="setrow"><div class="grow"><b>Son et vibration</b><div class="sm mute">À la fin de chaque temps de repos. <button class="link" style="min-height:0;padding:0" data-a="testBeep">Tester</button></div></div><input type="checkbox" class="sw" data-set="sound"${S.settings.sound?' checked':''}></label></section>
  <section class="sec"><div class="sh"><h2>Profil</h2></div><div class="card"><label class="fld"><span>Prénom</span><input class="in" id="uname" value="${esc(uName())}" maxlength="24" autocomplete="given-name" autocapitalize="words" placeholder="Ton prénom"></label></div></section>
- ${S.pet?`<section class="sec"><div class="sh"><h2>Compagnon</h2></div><div class="card"><div class="row">${thumb(S.pet.c,S.pet.form,false,'set-th')}<div class="grow"><b>${esc(PN[S.pet.c][S.pet.form])}</b><div class="sm mute">${esc(PETS[S.pet.c].sp)} · forme ${S.pet.form+1} sur 4</div></div></div><button class="btn line full mt12" data-a="replayEvo"${S.pet.form?'':' disabled'}>${S.pet.form?'Revoir sa dernière évolution':'Pas encore d’évolution à revoir'}</button></div></section>`:''}
+ ${S.pet?`<section class="sec"><div class="sh"><h2>Compagnon</h2></div><div class="card"><div class="row">${thumb(S.pet.c,S.pet.form,false,'set-th')}<div class="grow"><b>${esc(PN[S.pet.c][S.pet.form])}</b><div class="sm mute">${esc(PETS[S.pet.c].sp)} · forme ${S.pet.form+1} sur 4</div></div></div><button class="btn line full mt12" data-a="replayEvo"${S.pet.form?'':' disabled'}>${S.pet.form?'Revoir sa dernière évolution':'Pas encore d’évolution à revoir'}</button><p class="sm mute mt12">Pour changer de compagnon, glisse sur sa carte dans l’accueil. L’XP de tes séances va à celui qui est affiché.</p></div></section>`:''}
+ <section class="sec"><div class="sh"><h2>Aide</h2></div><button class="btn line full" data-a="tourOpen">Revoir la prise en main</button></section>
  <section class="sec"><div class="sh"><h2>Sauvegarde</h2></div><div class="card"><p>Tes données restent sur ce téléphone, dans l’app. Exporte une sauvegarde de temps en temps, vers Google Drive par exemple.</p><p class="sm mt8 ${old?'dn':'mute'}">Dernière sauvegarde : ${S.lastExport?fmtD(S.lastExport,{day:'numeric',month:'long'}):'jamais'}</p>
  <div class="g2 mt16"><button class="btn pri" data-a="exp">${ic('dl')} Exporter</button><button class="btn line" data-a="imp">${ic('ul')} Importer</button></div><input type="file" id="impFile" accept="application/json,.json" hidden>
  <details class="mt16"><summary class="sm mute">Coller une sauvegarde</summary><textarea class="in mt8" id="impTxt" placeholder="Colle ici le texte d’une sauvegarde Fonte"></textarea><button class="btn line full mt8" data-a="impPaste">Restaurer ce texte</button></details>
@@ -1145,7 +1187,7 @@ function vSet(){const custom=S.custom,d=derive(),old=S.sessions.length&&(!S.last
  ${custom.length?`<section class="sec"><div class="sh"><h2>Mes exercices</h2></div><div class="card list">${custom.map(x=>{const n=(d.hist[x.id]||[]).length;return `<div class="row"><div class="grow"><b>${esc(x.n)}</b><div class="xs mute">${MUS[x.m]}${n?` · ${plural(n,'séance')}`:''}</div></div>${n?'':`<button class="ib" data-a="customDel" data-id="${esc(x.id)}" aria-label="Supprimer ${esc(x.n)}">${ic('trash')}</button>`}</div>`}).join('')}</div></section>`:''}
  ${true?`<section class="sec"><div class="sh"><h2>Exercices bannis</h2><button class="link" data-a="banMgr">+ Bannir</button></div><div class="card list"><p class="sm mute">${(S.ban||[]).length?'Ils ne te sont plus proposés dans les séances automatiques ni dans les listes. Tu peux toujours les trouver en les cherchant.':'Aucun pour l’instant. Un exercice banni n’est plus proposé dans les séances automatiques ni dans les listes.'}</p>${(S.ban||[]).map(id=>`<div class="row">${musImg(exInfo(id).m)}<b class="grow">${esc(exInfo(id).n)}</b><button class="btn line" data-a="banDel" data-id="${esc(id)}">Rétablir</button></div>`).join('')}</div></section>`:''}
  <section class="sec"><div class="sh"><h2>Données</h2></div><div class="card list">${S.demo?`<button class="btn line full" data-a="clearDemo">Effacer les données d’exemple</button>`:!S.sessions.length?`<button class="btn line full" data-a="loadDemo">Charger des données d’exemple</button>`:''}<button class="btn line warn full" data-a="wipe">${ic('trash')} Tout effacer</button></div></section>
- <p class="xs mute mt20" style="text-align:center">Fonte 1.9 · ${plural(S.sessions.length,'séance')} enregistrée${S.sessions.length>1?'s':''}</p>`}
+ <p class="xs mute mt20" style="text-align:center">Fonte 2.0 · ${plural(S.sessions.length,'séance')} enregistrée${S.sessions.length>1?'s':''}</p>`}
 function navHtml(){return [['accueil','Accueil','home'],['seances','Séances','list'],['progres','Progrès','chart'],['defis','Défis','trophy'],['guide','Guide','book']].map(([r,l,i])=>`<button data-a="go" data-r="${r}"${route===r?' aria-current="page"':''}>${ic(i)}${l}</button>`).join('')}
 function renderLive(){const show=S.active&&!woOpen;document.body.classList.toggle('live',!!show);
  $('#live').innerHTML=show?`<button data-a="resume"><span class="pulse"></span><span class="grow" style="text-align:left">Séance en cours</span><span class="num" data-clock>${clkA(S.active)}</span><b>Reprendre</b></button>`:''}
@@ -1487,10 +1529,15 @@ function showSummary(s,b,a,evo){const st=a.st[s.id],gain=a.total-b.total,g=S.set
  const rest=gain-sum(lines.map(l=>l[1]));if(rest)lines.push(['Autres bonus',rest]);
  sheet('Séance terminée',`<div class="xpbig num">+${nf.format(gain)} XP</div><p class="mute mt8">${dur(s.end-s.start)} · ${plural(st.n,'série')}${st.p.length?` · ${plural(st.p.length,'record')}`:''}</p>
  ${petBlock(b,a,evo)}
+ ${nb.length?`<h3 class="mt20">${nb.length>1?'Trophées débloqués':'Trophée débloqué'}</h3><div class="badges won mt12">${nb.map(b=>badgeHtml(b,true)).join('')}</div>`:''}
  <div class="brk mt16">${lines.map(([l,v])=>`<span>${esc(l)}</span><b>+${v}</b>`).join('')}</div>
  ${st.p.length?`<h3 class="mt20">Records battus</h3><div class="list mt8">${st.p.map(p=>`<div class="row"><span class="chip pr">PR</span><span class="grow">${esc(exInfo(p.ex).n)}</span><b class="num">${setTxt(p.set)}</b></div>`).join('')}</div>`:''}
- ${nb.length?`<h3 class="mt20">Trophées débloqués</h3><div class="badges mt12">${nb.map(b=>badgeHtml(b,true)).join('')}</div>`:''}
- <div class="list mt20"><button class="btn line full" data-a="saveTpl" data-id="${esc(s.id)}">Enregistrer comme modèle</button><button class="btn pri full" data-a="close">Fermer</button></div>`);thumbs($('#sheets'))}
+ 
+ <div class="list mt20"><button class="btn line full" data-a="saveTpl" data-id="${esc(s.id)}">Enregistrer comme modèle</button><button class="btn pri full" data-a="close">Fermer</button></div>`);thumbs($('#sheets'));bdgWin()}
+function bdgWin(){document.querySelectorAll('#sheets .badges.won .bi').forEach((bi,k)=>{if(reduceM)return;const u=getComputedStyle(bi).backgroundImage;
+ const d=.25+k*.35;bi.style.animationDelay=d+'s';bi.parentNode.style.animationDelay=d+'s';if(!u||u==='none')return;
+ const s=document.createElement('i');s.className='shn';const m=u+', radial-gradient(closest-side,transparent 74%,#000 84%,#000 97%,transparent 100%)';
+ s.style.webkitMaskImage=m;s.style.maskImage=m;s.style.animationDelay=(d+1.1)+'s';bi.append(s)})}
 let REI=0;
 let BEI=0;
 function baseSheet(){const it=S.active&&S.active.items[BEI];if(!it){closeSheet();return}const b=it.base||0;
@@ -1735,6 +1782,11 @@ const ACT={
  chSel:b=>{if(!CH)return;CH.sel=+b.dataset.c;renderChooser()},
  chOk:()=>{if(CH)choosePet()},
  chLater:()=>closeChooser(),
+ petPrev:()=>{if(S.pet)petSwitch(S.pet.c-1,-1)},
+ petNext:()=>{if(S.pet)petSwitch(S.pet.c+1,1)},
+ tourNext:()=>{if(!CH||CH.mode!=='tour')return;if(CH.step<TOUR.length-1){CH.step++;renderChooser();I('choose').scrollTop=0}else tourEnd()},
+ tourEnd:()=>tourEnd(),
+ tourOpen:()=>{if(CH||S.active)return;CH={mode:'tour',step:0};I('choose').classList.add('on');document.body.classList.add('lock');renderChooser();I('choose').scrollTop=0},
  petShow:b=>{const p=S.pet,c=+b.dataset.c;if(!p||!p.done.includes(c))return;p.done=p.done.filter(x=>x!==c);if(!p.done.includes(p.c))p.done.push(p.c);p.c=c;p.form=3;save();render()},
  evoSkip:()=>{if(hasPets)Pets.skipEvo()},
  evoClose:()=>closeEvo(),
@@ -1786,6 +1838,13 @@ const isTyping=t=>t&&(t.tagName==='TEXTAREA'||(t.tagName==='INPUT'&&!['checkbox'
 document.addEventListener('focusin',e=>{if(!isTyping(e.target))return;document.body.classList.add('typing');const w=$('#wo');if(w&&w.contains(e.target))w.classList.add('typing')});
 document.addEventListener('focusout',e=>{if(!isTyping(e.target))return;setTimeout(()=>{if(isTyping(document.activeElement))return;document.body.classList.remove('typing');const w=$('#wo');w&&w.classList.remove('typing')},60)});
 window.addEventListener('hashchange',onHash);
+(function(){let on=false,sx=0,sy=0,pid=null;
+ document.addEventListener('pointerdown',e=>{if(!e.isTrusted||!e.target.closest)return;const v=e.target.closest('.pet-v');if(!v||e.target.closest('.pet-nav'))return;
+  on=true;sx=e.clientX;sy=e.clientY;pid=e.pointerId;if(e.target.id==='petcv')e.stopPropagation()},true);
+ document.addEventListener('pointerup',e=>{if(!on||e.pointerId!==pid)return;on=false;const dx=e.clientX-sx,dy=e.clientY-sy;
+  if(Math.abs(dx)>44&&Math.abs(dx)>Math.abs(dy)*1.4){if(S.pet)petSwitch(S.pet.c+(dx<0?1:-1),dx<0?1:-1);return}
+  if(Math.abs(dx)<12&&Math.abs(dy)<12){const cv=I('petcv');if(cv&&e.target.closest&&e.target.closest('.pet-v'))cv.dispatchEvent(new PointerEvent('pointerdown',{clientX:e.clientX,clientY:e.clientY,bubbles:true,pointerType:e.pointerType}))}},true);
+ document.addEventListener('pointercancel',()=>{on=false},true)})();
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();BIP=e;if(CH&&CH.mode==='install')renderChooser();else if(route==='reglages')render()});
 window.addEventListener('storage',e=>{if(e.key===KEY){S=load();D=null;EXM=null;render();if(woOpen)renderWO()}});
 if(!(S.flags&&S.flags.xp2)){let dl=0;S.sessions.forEach(s=>{let v=0,n=0;s.items.forEach(it=>it.sets.forEach(x=>{v+=x.w*x.r;n++}));dl+=n*(XPS-5)-Math.floor(v/100)});if(S.pet){S.pet.start+=dl}S.flags={...(S.flags||{}),xp2:1};save()}

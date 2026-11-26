@@ -1,6 +1,6 @@
 // Fonte — service worker : l'app s'ouvre instantanément et fonctionne hors connexion.
 // Pour publier une mise à jour, change le numéro de version ci-dessous.
-const CACHE = 'fonte-v13';
+const CACHE = 'fonte-v14';
 const ASSETS = ['./', './index.html', './companions.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
