@@ -1,6 +1,6 @@
 // Fonte — service worker : l'app s'ouvre instantanément et fonctionne hors connexion.
 // Pour publier une mise à jour, change le numéro de version ci-dessous.
-const CACHE = 'fonte-v7';
+const CACHE = 'fonte-v9';
 const ASSETS = ['./', './index.html', './companions.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
@@ -40,4 +40,13 @@ self.addEventListener('fetch', e => {
       return res;
     }))
   );
+});
+
+// Notification de fin de repos : la toucher ramène l’app au premier plan
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cs => {
+    const c = cs.find(x => 'focus' in x);
+    return c ? c.focus() : self.clients.openWindow('./#seance');
+  }));
 });
