@@ -1,10 +1,10 @@
 // Fonte — service worker : l'app s'ouvre instantanément et fonctionne hors connexion.
 // Pour publier une mise à jour, change le numéro de version ci-dessous.
-const CACHE = 'fonte-v9';
+const CACHE = 'fonte-v11';
 const ASSETS = ['./', './index.html', './companions.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -19,17 +19,21 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
 
-  // Page : réponse immédiate depuis le cache, mise à jour en arrière-plan.
+  // Page : la dernière version en ligne d'abord (3 s max), sinon celle gardée hors connexion.
   if (req.mode === 'navigate') {
-    e.respondWith(
-      caches.match('./index.html').then(cached => {
-        const net = fetch(req).then(res => {
-          if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put('./index.html', copy)); }
-          return res;
-        }).catch(() => cached);
-        return cached || net;
-      })
-    );
+    e.respondWith((async () => {
+      const cache = await caches.open(CACHE);
+      try {
+        const res = await Promise.race([
+          fetch(req, { cache: 'no-store' }),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000))
+        ]);
+        if (res && res.ok) { cache.put('./index.html', res.clone()); return res; }
+        throw new Error('bad');
+      } catch (err) {
+        return (await cache.match('./index.html')) || fetch(req);
+      }
+    })());
     return;
   }
 
